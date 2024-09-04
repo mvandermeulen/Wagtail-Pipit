@@ -2,7 +2,7 @@
 from wagtail_factories import SiteFactory
 
 from ..factories.base_page import BasePageFactory
-from ..factories.{{ name|lower }}_page import {{ name }}PageFactory
+from ..factories.{{ file_name }}_page import {{ name }}PageFactory
 from ..pages import {{ name }}PageSerializer
 
 
@@ -15,7 +15,7 @@ class {{ name }}PageTest(WagtailPageTests):
         page = {{ name }}PageFactory.create(title="{{ name }}", parent=self.root_page)
         self.assertEqual(page.get_serializer_class(), {{ name }}PageSerializer)
 
-    def test_to_react_representation(self):
+    def test_json_representation(self):
         page = {{ name }}PageFactory.create(title="{{ name }}", parent=self.root_page)
 
         data = page.get_component_data({})

@@ -26,6 +26,7 @@ the contents (Some files omitted for brevity):
 ```bash
 ├── .storybook      # Configuration for storybook
 ├── api             # Contains api libraries for communicating with Wagtail
+├── app             # Contains Next.js [app](https://nextjs.org/docs/app) (If using app router)
 ├── cli             # Contains the cli tool for generating new components
 ├── components      # Contains all Components
 ├── config          # Contains various configurations, ex for jest
@@ -35,7 +36,7 @@ the contents (Some files omitted for brevity):
 ├── index.css       # Entrypoing for global css from styles
 ├── jest.config.js  # Configuration for jest
 ├── next.config.js  # Configuration for Next.js
-├── pages           # Contains Next.js [pages](https://nextjs.org/docs/basic-features/pages)
+├── pages           # Contains Next.js [pages](https://nextjs.org/docs/basic-features/pages) (If using pages router)
 ├── public          # Static files to be served by Next.js
 ├── setupTests.js   # Test suite configurations
 ├── stories         # Default storybook directory
@@ -115,7 +116,7 @@ Let’s start coding the javascript, modify the `Button.js` so that it looks lik
 import React from 'react';
 import s from './Button.module.css';
 
-const Button = ({onClick, text}) => (
+const Button = ({ onClick, text }) => (
     <button className={s.Button} onClick={onClick}>
         {text}
     </button>
@@ -137,7 +138,7 @@ outside the scope for this tutorial.
 
 We need to provide the props `text` and `onClick` to our component to be able to work with it in the dev server.
 Add the following to `Button.data.js`:
-```
+```js
 export default {
     'text': 'Button text',
     'onClick': function() {console.log('clicked');}
@@ -266,7 +267,7 @@ Open the file `./i18n/translations/en.json` and replace it with this:
 As with the component, we need to provide storybook data. This should look as your Wagtail Page-serialization. 
 
 In our case, we only care about the `richText`-field. Add to `WordCountPage.data.js` like:
-```
+```js
 export default {
     'richText': '<p>paragraph one</p><p>Another paragraph</p>'
 };

@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -25,6 +25,10 @@ class Command(BaseCommand):
         password = options["password"]
         email = options["email"]
 
-        User.objects.create_superuser(username=username, password=password, email=email)
+        User.objects.create_superuser(
+            username=username,
+            password=password,
+            email=email,
+        )
 
         self.stdout.write('Local user "{}" was created'.format(username))

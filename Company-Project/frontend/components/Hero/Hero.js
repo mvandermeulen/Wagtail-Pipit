@@ -1,11 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import s from './Hero.module.css';
-import Logo from '../../public/img/logo.svg';
+import logo from '../../public/img/logo.svg';
+
+import i18n from '../../i18n';
 
 const Hero = ({ title }) => (
     <div className={s.Container}>
-        <Logo className={s.Logo} />
+        <img
+            className={s.Logo}
+            src={logo.src}
+            width={logo.width}
+            heigh={logo.height}
+        />
         <h1 className={s.Title}>
             <img
                 src={'/img/white_circle.png'}
@@ -14,6 +21,7 @@ const Hero = ({ title }) => (
             />
             {title}
         </h1>
+        <p className={s.Preamble}>{i18n.t('helloWorld')}</p>
     </div>
 );
 

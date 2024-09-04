@@ -3,19 +3,20 @@ from typing import Any, Callable, Dict, List, Tuple, Type, Union
 from django.db import models
 from django.http import JsonResponse
 from django.http.request import HttpRequest
+from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
-from django.utils.functional import cached_property
 from rest_framework.serializers import Serializer
 from wagtail.admin.panels import (
-    EditHandler,
     FieldPanel,
     MultiFieldPanel,
     ObjectList,
+    Panel,
     PanelGroup,
     TabbedInterface,
     WagtailAdminPageForm,
 )
+from wagtail.admin.widgets.slug import SlugInput
 from wagtail.models import Page
 from wagtail.utils.decorators import cached_classmethod
 from wagtail_meta_preview.panels import (
@@ -23,11 +24,7 @@ from wagtail_meta_preview.panels import (
     GoogleFieldPreviewPanel,
     TwitterFieldPreviewPanel,
 )
-from wagtail_meta_preview.utils import (
-    TwitterSettings,
-    FacebookSettings,
-    GoogleSettings,
-)
+from wagtail_meta_preview.utils import FacebookSettings, GoogleSettings, TwitterSettings
 
 
 class RedirectUpMixin:
@@ -51,7 +48,7 @@ class SeoMixin(Page):
         blank=True,
         null=True,
         verbose_name=_("Facebook title"),
-        help_text=_("Fallbacks to seo title if empty"),
+        help_text=_("Falls back to seo title if empty"),
     )
 
     og_description = models.CharField(
@@ -59,7 +56,7 @@ class SeoMixin(Page):
         blank=True,
         null=True,
         verbose_name=_("Facebook description"),
-        help_text=_("Fallbacks to seo description if empty"),
+        help_text=_("Falls back to seo description if empty"),
     )
 
     og_image = models.ForeignKey(
@@ -80,7 +77,7 @@ class SeoMixin(Page):
         blank=True,
         null=True,
         verbose_name=_("Twitter title"),
-        help_text=_("Fallbacks to facebook title if empty"),
+        help_text=_("Falls back to facebook title if empty"),
     )
 
     twitter_description = models.CharField(
@@ -88,7 +85,7 @@ class SeoMixin(Page):
         blank=True,
         null=True,
         verbose_name=_("Twitter description"),
-        help_text=_("Fallbacks to facebook description if empty"),
+        help_text=_("Falls back to facebook description if empty"),
     )
 
     twitter_image = models.ForeignKey(
@@ -98,7 +95,7 @@ class SeoMixin(Page):
         on_delete=models.SET_NULL,
         related_name="+",
         verbose_name=_("Twitter image"),
-        help_text=_("Fallbacks to facebook image if empty"),
+        help_text=_("Falls back to facebook image if empty"),
     )
 
     robot_noindex = models.BooleanField(
@@ -118,7 +115,7 @@ class SeoMixin(Page):
     )
 
     promote_panels = [
-        FieldPanel("slug"),
+        FieldPanel("slug", widget=SlugInput),
         GoogleFieldPreviewPanel(
             [
                 FieldPanel("seo_title"),
@@ -220,24 +217,30 @@ class SeoMixin(Page):
     def seo_meta_robots(self):
         index = "noindex" if self.robot_noindex else "index"
         follow = "nofollow" if self.robot_nofollow else "follow"
-        return "{},{}".format(index, follow)
+        meta_value = "{},{}".format(index, follow)
+
+        return {
+            "index": not self.robot_noindex,
+            "follow": not self.robot_nofollow,
+            "value": meta_value,
+        }
 
     class Meta:
         abstract = True
 
 
-class EnhancedEditHandlerMixin:
+class EnhancedPanelMixin:
     edit_handler: PanelGroup
-    content_panels: List[EditHandler]
-    promote_panels: List[EditHandler]
-    settings_panels: List[EditHandler]
+    content_panels: List[Panel]
+    promote_panels: List[Panel]
+    settings_panels: List[Panel]
     extra_panels: List[Tuple[str, str]]
     base_form_class: WagtailAdminPageForm
 
     @cached_classmethod
-    def get_edit_handler(cls) -> EditHandler:
+    def get_edit_handler(cls) -> Panel:
         """
-        Get the EditHandler to use in the Wagtail admin when editing
+        Get the Panel to use in the Wagtail admin when editing
         this page type.
         """
 
@@ -267,9 +270,9 @@ class EnhancedEditHandlerMixin:
                 )
             )
 
-        EditHandler = TabbedInterface(tabs, base_form_class=cls.base_form_class)
+        Panel_ = TabbedInterface(tabs, base_form_class=cls.base_form_class)
 
-        return EditHandler.bind_to_model(cls)
+        return Panel_.bind_to_model(cls)
 
 
 class TimestampMixin(models.Model):

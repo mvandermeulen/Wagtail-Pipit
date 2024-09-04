@@ -1,17 +1,17 @@
-from typing import List, Dict, Any, Optional, Union, Tuple, Type
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
-from django.utils.module_loading import import_string
 from django.http import HttpResponse, JsonResponse
 from django.http.request import HttpRequest
+from django.utils.module_loading import import_string
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from wagtail.models import Page, PageManager
 
-from ..mixins import EnhancedEditHandlerMixin, SeoMixin
+from ..mixins import EnhancedPanelMixin, SeoMixin
 
 
-class BasePage(EnhancedEditHandlerMixin, SeoMixin, Page):
+class BasePage(EnhancedPanelMixin, SeoMixin, Page):
     is_creatable = False
     show_in_menus_default = True
 
@@ -54,8 +54,11 @@ class BasePage(EnhancedEditHandlerMixin, SeoMixin, Page):
         context = context or {}
         dict_serializer_cls: Optional[Type[Serializer]]
 
-        if isinstance(serializer_cls, str):
-            dict_serializer_cls = import_string(self.serializer_class)
+        if serializer_cls:
+            if isinstance(serializer_cls, str):
+                dict_serializer_cls = import_string(serializer_cls)
+            else:
+                dict_serializer_cls = serializer_cls
         else:
             dict_serializer_cls = self.get_serializer_class()
 
@@ -66,21 +69,9 @@ class BasePage(EnhancedEditHandlerMixin, SeoMixin, Page):
         return serializer.data
 
     def get_serializer_class(self) -> Type[Serializer]:
-        cls: Type[Serializer] = import_string(self.serializer_class)
+        cls: Type[Serializer]
+        if isinstance(self.serializer_class, str):
+            cls = import_string(self.serializer_class)
+        else:
+            cls = self.serializer_class
         return cls
-
-    def get_preview_url(self, token):
-        """
-        Override wagtail_headless_preview/get_preview_url and append hostname
-        """
-        import urllib
-
-        preview_url = super().get_preview_url(token)
-        preview_url = (
-            preview_url
-            + "&"
-            + urllib.parse.urlencode(
-                {"host": f"{self.get_site().hostname}:{self.get_site().port}"}
-            )
-        )
-        return preview_url

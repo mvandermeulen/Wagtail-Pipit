@@ -44,10 +44,12 @@ server {
     #     rewrite "^/wt/media/(.*)$" "https://${MEDIA_REMOTE_DOMAIN}/wt/media/$1" redirect;
     # }
 
-    location /wt/static/ {
-        expires 30d;
-        alias /app/static/;
-    }
+    # Uncomment if you do not wish to serve statics with whitenoise
+    #
+    # location /wt/static/ {
+    #     expires 30d;
+    #     alias /app/static/;
+    # }
 
     location / {
         proxy_set_header Host $host:8081;
@@ -67,7 +69,7 @@ server {
         proxy_set_header Host $host:8081;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass ${PYTHON_HOST}:8000/wt;
+        proxy_pass ${PYTHON_HOST}:8000/_util;
     }
 
     location /wt {

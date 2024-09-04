@@ -3,6 +3,7 @@ from wagtail.models import Site
 
 from sitesettings.models import SiteSetting
 from sitesettings.serializers import SiteSettingSerializer
+
 from .pages import BasePage
 
 
@@ -35,7 +36,7 @@ class SeoSerializer(serializers.ModelSerializer):
             "seo_twitter_description",
             "seo_twitter_image",
             "seo_meta_robots",
-            "canonical_link",
+            "seo_canonical_link",
         ]
 
     def get_seo_og_image(self, page):

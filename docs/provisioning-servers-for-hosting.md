@@ -9,11 +9,11 @@ The server should have these applications/packages installed:
 - Linux (Ubuntu 20.04+ is preffered)
 - Nginx
 - uWSGI
-- Python 3.10+
+- Python 3.11+
 - PostgreSQL 12+
 - PostGIS for PostgreSQL
 - GDAL (required for PostGIS)
-- Node 12+
+- Node 20+
 - [PM2](https://pm2.io/)
 - [psycopg2-binary](https://pypi.org/project/psycopg2-binary/) (this is required for the provision script that will create db and users)
 
@@ -61,6 +61,7 @@ Configuration:
     ```
     >>> ansible-galaxy install -r requirements.yml
     ```
+- (Optional) If you want another database collation then sv_SE update `lc_collate` and lc_ctype` in provision.yml
 - Now that we have everything installed, lets run the provisioning:
 - For stage
     ```

@@ -29,9 +29,20 @@ CACHES = {
     },
 }
 
-STATICFILES_STORAGE = (
-    "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"  # NOQA
-)
+MIDDLEWARE = [
+    *MIDDLEWARE[:1],
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    *MIDDLEWARE[1:],
+]
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    },
+}
 
 # Enable caching of templates in production environment
 TEMPLATES[0]["OPTIONS"]["loaders"] = [  # type: ignore[index]
@@ -75,6 +86,7 @@ sentry_sdk.init(
     environment=SENTRY_ENVIRONMENT,
     debug=True,
     integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0,
 )
 
 # Add sentry to logging

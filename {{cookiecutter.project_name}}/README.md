@@ -19,10 +19,10 @@
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.11+
 - Pip
 - Virtualenv (or the package manage of your choice)
-- Node 16
+- Node 20
 - Docker ([Install instructions](#how-do-i-install-docker-on-macoswindows))
 - [mkcert](https://github.com/FiloSottile/mkcert)
 

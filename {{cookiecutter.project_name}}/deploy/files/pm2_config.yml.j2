@@ -1,15 +1,14 @@
 {% raw -%}
 apps:
   - name: {{ project_slug }}
-    script: /mnt/persist/www/{{ project_slug }}/current/src/frontend/node_modules/next/dist/bin/next
-    args: start
-    cwd: /mnt/persist/www/{{ project_slug }}/current/src/frontend/
+    script: {{ ansistrano_deploy_to }}/current/src/frontend/.next/standalone/server.js
+    cwd: {{ ansistrano_deploy_to }}/current/src/frontend/
     exec_mode: cluster
     instances: 0
     max_memory_restart: "350M"
     uid: 'deploy'
     gid: 'www-data'
     env:
-      NODE_PORT: {{ 3000+(pm2_application_count.stdout|int) }}
+      PORT: {{ 3000+(pm2_application_count.stdout|int) }}
       NODE_ENV: production
 {% endraw %}

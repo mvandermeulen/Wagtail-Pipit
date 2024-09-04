@@ -51,16 +51,30 @@
         group: www-data
         mode: 0664
 
-    - name: Creates postgres database
+    - name: Creates postgres database (with sv_SE collation)
       postgresql_db:
         name: "{{ database_name }}"
+        lc_collate: sv_SE.utf8
+        lc_ctype: sv_SE.utf8
+        template: template0
 
     - name: Creates postgres user
       postgresql_user:
         db: "{{ database_name }}"
         name: "{{ database_user }}"
         password: "{{ database_password }}"
-        priv: ALL
+
+    - name: Associate postgres user to database
+      postgresql_privs:
+        db: "{{ database_name }}"
+        privs: ALL
+        type: database
+        role: "{{ database_user }}"
+
+    - name: Adds postgis extension
+      postgresql_ext:
+        name: postgis
+        db: "{{ database_name }}"
 
     - name: Creates uWSGI config
       template:
@@ -108,6 +122,6 @@
     - name: Add wagtail cronjobs
       lineinfile:
         path: /mnt/persist/etc/crontab
-        line: "0 * * * *  www-data /mnt/persist/www/{{ project_slug }}/shared/venv/bin/python /mnt/persist/www/{{ project_slug }}/current/src/manage.py publish_scheduled_pages"
+        line: "0 * * * *  www-data {{ ansistrano_deploy_to }}/shared/venv/bin/python {{ ansistrano_deploy_to }}/current/src/manage.py publish_scheduled_pages"
 
 {% endraw %}
